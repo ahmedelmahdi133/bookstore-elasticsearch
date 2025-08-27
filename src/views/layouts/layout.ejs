@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || "📚 Modern Bookstore" %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      --secondary-gradient: linear-gradient(135deg, #fefefe 0%, #f1f3f4 100%);
+      --success-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      --accent-light: #fff8e1;
+      --accent-medium: #fff3c4;
+      --accent-subtle: #fffbf0;
+      --blue-light: #e3f2fd;
+      --blue-medium: #90caf9;
+      --blue-dark: #1976d2;
+      --card-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      --card-hover-shadow: 0 15px 35px rgba(0,0,0,0.12);
+      --border-radius: 16px;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+      min-height: 100vh;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .card {
+      border: none;
+      border-radius: var(--border-radius);
+      box-shadow: var(--card-shadow);
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--card-hover-shadow);
+    }
+    
+    .btn {
+      border-radius: 12px;
+      font-weight: 500;
+      padding: 0.6rem 1.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border: 1px solid #90caf9;
+      color: #1976d2;
+      font-weight: 600;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(25, 118, 210, 0.2);
+      background: linear-gradient(135deg, #90caf9 0%, #64b5f6 100%);
+      color: white;
+      border-color: #42a5f5;
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 100%);
+      border: 1px solid #c8e6c9;
+      color: #388e3c;
+      font-weight: 600;
+    }
+    
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(56, 142, 60, 0.2);
+      background: linear-gradient(135deg, #a5d6a7 0%, #81c784 100%);
+      color: white;
+      border-color: #66bb6a;
+    }
+    
+    .navbar {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .navbar-brand {
+      font-family: 'Playfair Display', serif;
+      font-weight: 600;
+      font-size: 1.5rem;
+      color: #1976d2 !important;
+      text-shadow: none;
+    }
+    
+    .navbar-nav .nav-link {
+      color: #424242 !important;
+      font-weight: 500;
+    }
+    
+    .navbar-nav .nav-link:hover {
+      color: #1976d2 !important;
+      background-color: rgba(25, 118, 210, 0.08);
+      border-radius: 8px;
+    }
+    
+    .form-control {
+      border-radius: 12px;
+      border: 2px solid #e9ecef;
+      padding: 0.75rem 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      border-color: #90caf9;
+      box-shadow: 0 0 0 0.2rem rgba(144, 202, 249, 0.25);
+    }
+    
+    .page-header {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      color: #424242;
+      padding: 3rem 0;
+      margin-bottom: 2rem;
+      border-radius: 0 0 2rem 2rem;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .book-card {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .book-card .card-img-top {
+      transition: transform 0.3s ease;
+    }
+    
+    .book-card:hover .card-img-top {
+      transform: scale(1.05);
+    }
+    
+    .price-tag {
+      background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%);
+      color: #388e3c;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      display: inline-block;
+      border: 1px solid #c8e6c9;
+    }
+    
+    .badge {
+      border-radius: 8px;
+      padding: 0.5rem 0.8rem;
+    }
+    
+    .badge.bg-light {
+      background-color: #f5f5f5 !important;
+      border: 1px solid #e0e0e0;
+      color: #616161 !important;
+    }
+    
+    .btn-outline-secondary {
+      border-color: #e0e0e0;
+      color: #616161;
+    }
+    
+    .btn-outline-secondary:hover {
+      background-color: #f5f5f5;
+      border-color: #bdbdbd;
+      color: #424242;
+    }
+    
+    .alert-info {
+      background-color: #e3f2fd;
+      border-color: #90caf9;
+      color: #1976d2;
+    }
+    
+    .alert-success {
+      background-color: #e8f5e8;
+      border-color: #a5d6a7;
+      color: #388e3c;
+    }
+    
+    .alert {
+      border: none;
+      border-radius: var(--border-radius);
+      backdrop-filter: blur(10px);
+    }
+    
+    .modal-content {
+      border: none;
+      border-radius: var(--border-radius);
+    }
+    
+    .search-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(224, 224, 224, 0.5);
+    }
+    
+    @media (max-width: 768px) {
+      .page-header {
+        padding: 2rem 0;
+      }
+      
+      .card {
+        margin-bottom: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  
+  <!-- Flash Messages -->
+  <% if (typeof messages !== 'undefined' && messages) { %>
+    <% Object.keys(messages).forEach(type => { %>
+      <% messages[type].forEach(message => { %>
+        <div class="alert alert-<%= type === 'error' ? 'danger' : type %> alert-dismissible fade show m-3" role="alert">
+          <%= message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      <% }) %>
+    <% }) %>
+  <% } %>
+
+  <%- body %> <!-- 👈 express-ejs-layouts replaces this -->
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Cart count loader -->
+  <% if (typeof user !== 'undefined' && user) { %>
+    <script>
+      // Load cart count on page load
+      document.addEventListener('DOMContentLoaded', async function() {
+        try {
+          const response = await fetch('/cart/count');
+          const data = await response.json();
+          
+          const cartBadge = document.querySelector('.cart-count');
+          if (cartBadge && data.count > 0) {
+            cartBadge.textContent = data.count;
+            cartBadge.style.display = 'inline';
+          }
+        } catch (error) {
+          console.log('Error loading cart count:', error);
+        }
+      });
+    </script>
+  <% } %>
+</body>
+</html>

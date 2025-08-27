@@ -1,0 +1,25 @@
+<div class="card shadow p-4 mx-auto mt-5" style="max-width: 500px;">
+  <h2 class="text-center mb-4">Create an Account</h2>
+  <form action="/auth/signup" method="POST">
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input type="text" class="form-control" id="username" name="username" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Email address</label>
+      <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+  </form>
+
+  <div class="text-center mt-3">
+    <a href="/auth/login">Already have an account? Log in</a>
+  </div>
+</div>
