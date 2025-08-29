@@ -1,0 +1,67 @@
+# Environment Variables Template for Vercel Deployment
+# Copy these to your Vercel project settings (Project → Settings → Environment Variables)
+
+# ===========================================
+# BACKEND ENVIRONMENT VARIABLES
+# ===========================================
+
+# Database Connection
+MONGO_URI=mongodb+srv://your-username:your-password@cluster.mongodb.net/bookstore
+
+# Authentication
+JWT_SECRET=your-super-secure-jwt-secret-key-minimum-32-characters
+
+# Elasticsearch Configuration
+ELASTICSEARCH_NODE=https://your-elasticsearch-url
+ELASTICSEARCH_USERNAME=your-username  
+ELASTICSEARCH_PASSWORD=your-password
+
+# Email Service (SendGrid)
+SENDGRID_API_KEY=SG.your-sendgrid-api-key
+FROM_EMAIL=noreply@yourdomain.com
+
+# File Upload Service (Cloudinary)
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+
+# Payment Processing (Stripe)
+STRIPE_SECRET_KEY=sk_test_your-stripe-secret-key
+STRIPE_PUBLISHABLE_KEY=pk_test_your-stripe-publishable-key
+
+# CORS Configuration
+FRONTEND_URL=https://your-project-name.vercel.app
+
+# Application Environment
+NODE_ENV=production
+
+# ===========================================
+# FRONTEND ENVIRONMENT VARIABLES  
+# ===========================================
+
+# API Base URL (should match your Vercel domain)
+VITE_API_URL=https://your-project-name.vercel.app
+
+# Stripe Frontend Key
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your-stripe-publishable-key
+
+# ===========================================
+# QUICK SETUP INSTRUCTIONS
+# ===========================================
+
+1. Go to vercel.com/dashboard
+2. Select your project
+3. Click Settings → Environment Variables
+4. Add each variable above with your actual values
+5. Make sure to set them for both "Production" and "Preview"
+6. Redeploy your project after adding variables
+
+# ===========================================
+# SECURITY NOTES
+# ===========================================
+
+- Never commit actual values to Git
+- Use strong JWT secrets (32+ characters)
+- Use production Stripe keys for live deployment
+- Ensure MongoDB allows Vercel IP ranges
+- Keep API keys secure and rotate regularly
