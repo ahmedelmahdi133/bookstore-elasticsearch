@@ -11,11 +11,6 @@
       "src": "/(.*)",
       "dest": "/api/index.js"
     }
-  ],
-  "static": [
-    {
-      "src": "src/views",
-      "dest": "views"
-    }
   ]
+ 
 }
