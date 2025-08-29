@@ -6,29 +6,18 @@ import cloudinary from "../config/cloudinary.js";
 
 const router = express.Router();
 
-const requireLogin = (req, res, next) => {
-  if (!req.session.user) {
-    req.flash("error", "Please login first.");
-    return res.redirect("/auth/login");
-  }
-  next();
-};
+import { auth } from "../middleware/auth.js";
 
-const requireAdmin = (req, res, next) => {
-  if (!req.session.user || req.session.user.role !== "admin") {
-    req.flash("error", "Admins only!");
-    return res.redirect("/books");
-  }
-  next();
-};
+const requireLogin = auth();
+const requireAdmin = auth(['admin']);
 
 router.get("/", async (req, res) => {
   try {
     const books = await Book.find().limit(20);
-    res.render("books/index", { title: "Books", books });
+    res.json(books);
   } catch (err) {
     console.log("Error fetching books:", err);
-    res.render("books/index", { title: "Books", books: [] });
+    res.status(500).json({ error: "Failed to fetch books", books: [] });
   }
 });
 
@@ -66,12 +55,10 @@ router.post("/add", requireAdmin, upload.single('image'), async (req, res) => {
       }
     });
 
-    req.flash("success", "Book added successfully!");
-    res.redirect("/books");
+    res.status(201).json({ message: "Book added successfully!", book });
   } catch (err) {
     console.log("Error adding book:", err);
-    req.flash("error", err.message || "Failed to add book");
-    res.redirect("/books");
+    res.status(500).json({ error: err.message || "Failed to add book" });
   }
 });
 
@@ -81,11 +68,11 @@ router.get("/search", async (req, res) => {
     const { q, genre, minPrice, maxPrice } = req.query;
     
     if (!q && !genre && !minPrice && !maxPrice) {
-      return res.render("books/search", { 
-        title: "Search", 
+      return res.json({ 
         books: [], 
         query: "",
-        filters: { genre: "", minPrice: "", maxPrice: "" }
+        filters: { genre: "", minPrice: "", maxPrice: "" },
+        totalResults: 0
       });
     }
 
@@ -180,8 +167,7 @@ router.get("/search", async (req, res) => {
       }
     }
 
-    res.render("books/search", { 
-      title: "Search Results", 
+    res.json({ 
       books,
       query: q || "",
       filters: {
@@ -195,13 +181,12 @@ router.get("/search", async (req, res) => {
 
   } catch (err) {
     console.log("Search error:", err);
-    req.flash("error", "Search failed: " + err.message);
-    res.render("books/search", { 
-      title: "Search", 
+    res.status(500).json({ 
       books: [], 
       query: req.query.q || "",
       filters: { genre: "", minPrice: "", maxPrice: "" },
-      error: err.message
+      error: err.message,
+      totalResults: 0
     });
   }
 });
@@ -336,8 +321,7 @@ router.get("/edit/:id", requireAdmin, async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
     if (!book) {
-      req.flash("error", "Book not found");
-      return res.redirect("/books");
+      return res.status(404).json({ error: "Book not found" });
     }
     res.json(book);
   } catch (err) {

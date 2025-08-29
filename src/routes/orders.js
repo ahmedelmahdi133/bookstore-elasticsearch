@@ -1,32 +1,22 @@
 import express from "express";
 import Order from "../models/Order.js";
+import { auth } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Middleware: check login
-const requireLogin = (req, res, next) => {
-  if (!req.session.user) {
-    req.flash("error", "Please login first.");
-    return res.redirect("/auth/login");
-  }
-  next();
-};
+const requireLogin = auth();
 
 // Get user orders
 router.get("/", requireLogin, async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.session.user.id })
+    const orders = await Order.find({ user: req.user.userId })
       .populate('items.book')
       .sort({ createdAt: -1 });
 
-    res.render("orders/index", { 
-      title: "My Orders", 
-      orders 
-    });
+    res.json(orders);
   } catch (err) {
     console.log("Error fetching orders:", err);
-    req.flash("error", "Failed to load orders");
-    res.redirect("/");
+    res.status(500).json({ error: "Failed to load orders" });
   }
 });
 
@@ -35,22 +25,17 @@ router.get("/:orderId", requireLogin, async (req, res) => {
   try {
     const order = await Order.findOne({
       _id: req.params.orderId,
-      user: req.session.user.id
+      user: req.user.userId
     }).populate('items.book');
 
     if (!order) {
-      req.flash("error", "Order not found");
-      return res.redirect("/orders");
+      return res.status(404).json({ error: "Order not found" });
     }
 
-    res.render("orders/detail", { 
-      title: "Order Details", 
-      order 
-    });
+    res.json(order);
   } catch (err) {
     console.log("Error fetching order:", err);
-    req.flash("error", "Failed to load order details");
-    res.redirect("/orders");
+    res.status(500).json({ error: "Failed to load order details" });
   }
 });
 

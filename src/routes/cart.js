@@ -3,37 +3,25 @@ import Cart from "../models/Cart.js";
 import Book from "../models/Book.js";
 import Order from "../models/Order.js";
 import stripe from "../config/stripe.js";
+import { auth } from "../middleware/auth.js";
 
 const router = express.Router();
 
-const requireLogin = (req, res, next) => {
-  if (!req.session.user) {
-    req.flash("error", "Please login first.");
-    return res.redirect("/auth/login");
-  }
-  next();
-};
+const requireLogin = auth();
 
 router.get("/", requireLogin, async (req, res) => {
   try {
-    const cart = await Cart.findOne({ user: req.session.user.id })
+    const cart = await Cart.findOne({ user: req.user.userId })
       .populate('items.book');
     
     if (!cart) {
-      return res.render("cart/index", { 
-        title: "Shopping Cart", 
-        cart: { items: [], totalAmount: 0, totalItems: 0 }
-      });
+      return res.json({ items: [], totalAmount: 0, totalItems: 0 });
     }
 
-    res.render("cart/index", { 
-      title: "Shopping Cart", 
-      cart 
-    });
+    res.json(cart);
   } catch (err) {
     console.log("Error fetching cart:", err);
-    req.flash("error", "Failed to load cart");
-    res.redirect("/books");
+    res.status(500).json({ error: "Failed to load cart" });
   }
 });
 
@@ -64,9 +52,9 @@ router.post("/add", requireLogin, async (req, res) => {
     }
 
     // Find or create cart
-    let cart = await Cart.findOne({ user: req.session.user.id });
+    let cart = await Cart.findOne({ user: req.user.userId });
     if (!cart) {
-      cart = new Cart({ user: req.session.user.id, items: [] });
+      cart = new Cart({ user: req.user.userId, items: [] });
     }
 
     // Add item to cart
@@ -90,7 +78,7 @@ router.put("/update", requireLogin, async (req, res) => {
   try {
     const { bookId, quantity } = req.body;
     
-    const cart = await Cart.findOne({ user: req.session.user.id });
+    const cart = await Cart.findOne({ user: req.user.userId });
     if (!cart) {
       return res.status(404).json({ error: "Cart not found" });
     }
@@ -114,7 +102,7 @@ router.delete("/remove/:bookId", requireLogin, async (req, res) => {
   try {
     const { bookId } = req.params;
     
-    const cart = await Cart.findOne({ user: req.session.user.id });
+    const cart = await Cart.findOne({ user: req.user.userId });
     if (!cart) {
       return res.status(404).json({ error: "Cart not found" });
     }
@@ -136,7 +124,7 @@ router.delete("/remove/:bookId", requireLogin, async (req, res) => {
 // Clear cart
 router.delete("/clear", requireLogin, async (req, res) => {
   try {
-    const cart = await Cart.findOne({ user: req.session.user.id });
+    const cart = await Cart.findOne({ user: req.user.userId });
     if (cart) {
       await cart.clearCart();
     }
@@ -151,7 +139,7 @@ router.delete("/clear", requireLogin, async (req, res) => {
 // Get cart count (for navbar)
 router.get("/count", requireLogin, async (req, res) => {
   try {
-    const cart = await Cart.findOne({ user: req.session.user.id });
+    const cart = await Cart.findOne({ user: req.user.userId });
     const count = cart ? cart.totalItems : 0;
     
     res.json({ count });

@@ -8,39 +8,31 @@ import emailService from "../services/emailService.js";
 
 const router = express.Router();
 
-const requireLogin = (req, res, next) => {
-  if (!req.session.user) {
-    req.flash("error", "Please login first.");
-    return res.redirect("/auth/login");
-  }
-  next();
-};
+import { auth } from "../middleware/auth.js";
+
+const requireLogin = auth();
 
 router.get("/checkout", requireLogin, async (req, res) => {
   try {
     // Check if Stripe is configured
     if (!stripe || !process.env.STRIPE_PUBLISHABLE_KEY) {
-      req.flash("error", "Payment system is not configured. Please contact support.");
-      return res.redirect("/cart");
+      return res.status(500).json({ error: "Payment system is not configured. Please contact support." });
     }
 
-    const cart = await Cart.findOne({ user: req.session.user.id })
+    const cart = await Cart.findOne({ user: req.user.userId })
       .populate('items.book');
     
     if (!cart || cart.items.length === 0) {
-      req.flash("error", "Your cart is empty");
-      return res.redirect("/cart");
+      return res.status(400).json({ error: "Your cart is empty" });
     }
 
-    res.render("payment/checkout", { 
-      title: "Checkout", 
+    res.json({ 
       cart,
       stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY
     });
   } catch (err) {
     console.log("Error loading checkout:", err);
-    req.flash("error", "Failed to load checkout");
-    res.redirect("/cart");
+    res.status(500).json({ error: "Failed to load checkout" });
   }
 });
 
@@ -51,7 +43,7 @@ router.post("/create-payment-intent", requireLogin, async (req, res) => {
       return res.status(500).json({ error: "Payment system not configured" });
     }
 
-    const cart = await Cart.findOne({ user: req.session.user.id })
+    const cart = await Cart.findOne({ user: req.user.userId })
       .populate('items.book');
     
     if (!cart || cart.items.length === 0) {
@@ -72,7 +64,7 @@ router.post("/create-payment-intent", requireLogin, async (req, res) => {
       amount: Math.round(cart.totalAmount * 100), // Convert to cents
       currency: 'usd',
       metadata: {
-        userId: req.session.user.id,
+        userId: req.user.userId,
         cartId: cart._id.toString()
       },
       automatic_payment_methods: {
@@ -107,7 +99,7 @@ router.post("/success", requireLogin, async (req, res) => {
     }
 
     // Get cart
-    const cart = await Cart.findOne({ user: req.session.user.id })
+    const cart = await Cart.findOne({ user: req.user.userId })
       .populate('items.book');
     
     if (!cart || cart.items.length === 0) {
