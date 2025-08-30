@@ -1,23 +1,15 @@
-
 {
   "name": "bookstore-with-elastic-search",
   "version": "1.0.0",
   "main": "src/app.js",
   "type": "module",
-  "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
-    "build": "cd frontend && npm run build",
-    "vercel-build": "cd frontend && npm install && npm run build",
-    "deploy": "vercel --prod",
-    "deploy:script": "node vercel-setup.js",
-    "deploy:windows": "deploy.bat",
-    "deploy:unix": "./deploy.sh",
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "npm run dev",
-    "install:all": "npm install && cd frontend && npm install",
-    "setup": "node vercel-setup.js"
-  },
+ "scripts": {
+  "start": "node src/app.js",
+  "dev": "nodemon src/app.js",
+  "build": "cd frontend && npm run build",
+  "netlify:dev": "netlify dev"
+},
+
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -34,10 +26,11 @@
     "mongoose": "^8.18.0",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
-    "stripe": "^18.4.0",
-    "serverless-http": "^3.2.0"
+    "serverless-http": "^3.2.0",
+    "stripe": "^18.4.0"
   },
   "devDependencies": {
+    "netlify-lambda": "^2.0.16",
     "nodemon": "^3.0.0"
   }
 }
