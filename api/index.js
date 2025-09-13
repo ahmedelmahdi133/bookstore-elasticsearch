@@ -1,5 +1,5 @@
-import app from "../src/app.js";
 
-export default function handler(req, res) {
-  app.handle(req, res);
-}
+import app from "../src/app.js";
+import serverless from "@vendia/serverless-express";
+
+export default serverless(app);
